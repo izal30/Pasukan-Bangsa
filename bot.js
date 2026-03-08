@@ -9,10 +9,10 @@ const client = new Client({
 });
 
 const cooldown = new Map();
-const COOLDOWN_TIME = 3000;
+const delay = 3000;
 
 client.once("clientReady", () => {
-  console.log(`Bot aktif sebagai ${client.user.tag}`);
+  console.log("Bot sudah online");
 });
 
 client.on("messageCreate", async (message) => {
@@ -23,9 +23,7 @@ client.on("messageCreate", async (message) => {
   const now = Date.now();
 
   if (cooldown.has(userId)) {
-    const expiration = cooldown.get(userId) + COOLDOWN_TIME;
-
-    if (now < expiration) {
+    if (now - cooldown.get(userId) < delay) {
       return;
     }
   }
@@ -33,29 +31,22 @@ client.on("messageCreate", async (message) => {
   const regex = /videy\.co\/v\?id=([a-zA-Z0-9]+)/g;
   const matches = [...message.content.matchAll(regex)];
 
-  if (matches.length === 0) return;
+  if (!matches.length) return;
 
   cooldown.set(userId, now);
 
-  let results = [];
+  let links = [];
 
   for (let i = 0; i < matches.length && i < 5; i++) {
     const id = matches[i][1];
-    results.push(`https://cdn2.videy.co/${id}.mp4`);
-  }
-
-  const output = results.join("\n");
-
-  try {
-    await message.delete();
-  } catch (err) {
-    console.log("Tidak bisa hapus pesan");
+    links.push(`https://cdn2.videy.co/${id}.mp4`);
   }
 
   try {
-    await message.channel.send(output);
+    await message.delete().catch(() => {});
+    await message.channel.send(links.join("\n"));
   } catch (err) {
-    console.log("Gagal kirim pesan:", err);
+    console.log(err);
   }
 
 });
