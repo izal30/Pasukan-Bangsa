@@ -44,10 +44,7 @@ client.on("messageCreate", async (message) => {
     results.push(`https://cdn2.videy.co/${id}.mp4`);
   }
 
-  const output =
-`Converted by ${message.author}:
-
-${results.join("\n")}`;
+  const output = results.join("\n");
 
   try {
     await message.delete();
