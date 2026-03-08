@@ -11,7 +11,7 @@ const client = new Client({
 const cooldown = new Map();
 const COOLDOWN_TIME = 3000;
 
-client.once("ready", () => {
+client.once("clientReady", () => {
   console.log(`Bot aktif sebagai ${client.user.tag}`);
 });
 
