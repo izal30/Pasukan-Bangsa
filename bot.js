@@ -18,17 +18,30 @@ client.on("messageCreate", async (message) => {
 
   if (message.author.bot) return;
 
-  const regex = /videy\.co\/v\?id=([a-zA-Z0-9]+)/;
+  const regex = /videy\.co\/v\?id=([a-zA-Z0-9]+)/g;
 
-  const match = message.content.match(regex);
+  const matches = [...message.content.matchAll(regex)];
 
-  if (!match) return;
+  if (matches.length === 0) return;
 
-  const id = match[1];
+  let results = [];
 
-  const cdn = `https://cdn2.videy.co/${id}.mp4`;
+  for (const match of matches) {
+    const id = match[1];
+    results.push(`https://cdn2.videy.co/${id}.mp4`);
+  }
 
-  message.reply(cdn);
+  try {
+
+    // hapus pesan asli
+    await message.delete();
+
+    // kirim semua hasil
+    await message.channel.send(results.join("\n"));
+
+  } catch (error) {
+    console.log(error);
+  }
 
 });
 
